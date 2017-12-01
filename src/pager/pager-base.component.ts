@@ -5,7 +5,7 @@ import { IPager } from './pager.interface';
 import { PagerOptions } from './pager-options.model';
 import { Observer } from 'rxjs/rx';
 import { Filters } from '../filter/index';
-import { PageOptions } from '../../api/index';
+import { PageOptions } from '@open-age/ng-api';
 
 export class PagerBaseComponent<TModel> implements IPager {
 

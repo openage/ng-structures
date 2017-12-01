@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { IApi, PageOptions } from '../../api/index';
+import { IApi, PageOptions } from '@open-age/ng-api';
 
 export class PagerOptions<TModel> {
 

@@ -1,4 +1,4 @@
-import { IApi } from "../../api/index";
+import { IApi } from '@open-age/ng-api';
 
 
 export class DetailOptions<TModel> {
