@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 
 import { IPager } from './pager.interface';
 import { PagerOptions } from './pager-options.model';
-import { Observer } from 'rxjs/rx';
+import { Observable } from 'rxjs/Rx';
 import { Filters } from '../filter/index';
 import { PageOptions } from '@open-age/ng-api';
 
