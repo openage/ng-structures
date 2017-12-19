@@ -70,7 +70,7 @@ export class DetailBase<TModel> {
 
   update(): Observable<TModel> {
     this.isProcessing = true;
-    const id = this.properties['id'];
+    const id = this.properties[this.options.fields.id];
     return this.options.api.update(id, this.properties)
       .map(data => {
         this.setModel(data);

@@ -1,6 +1,6 @@
 {
   "name": "@open-age/ng-structures",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "structures to create angular application",
   "main": "./dist/index.ts",
   "types": "./dist/index.ts",
@@ -27,7 +27,7 @@
     "@angular/core": "^5.0.5",
     "@angular/http": "^5.0.5",
     "@angular/platform-browser": "^5.0.5",
-    "@open-age/ng-api": "^0.0.4",
+    "@open-age/ng-api": "^0.0.5",
     "moment": "^2.19.3",
     "rxjs": "^5.5.2",
     "zone.js": "^0.8.18"
@@ -37,13 +37,13 @@
     "@angular/core": "^5.0.5",
     "@angular/http": "^5.0.5",
     "@angular/platform-browser": "^5.0.5",
-    "@open-age/ng-api": "^0.0.4",
-    "moment": "^2.19.3",
-    "rxjs": "^5.5.2",
-    "zone.js": "^0.8.18",
+    "@open-age/ng-api": "0.0.6",
     "@types/node": "^7.0.14",
     "del": "^2.2.2",
+    "moment": "^2.19.3",
     "node-sass": "^4.5.3",
-    "typescript": "^2.3.2"
+    "rxjs": "^5.5.2",
+    "typescript": "^2.3.2",
+    "zone.js": "^0.8.18"
   }
 }
