@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { URLSearchParams } from '@angular/http';
 import { Filter } from './filter.model';
-var Filters = (function () {
+var Filters = /** @class */ (function () {
     function Filters(options) {
         var _this = this;
         this.options = options;

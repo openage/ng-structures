@@ -8,7 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Input } from '@angular/core';
-var DetailBase = (function () {
+var DetailBase = /** @class */ (function () {
     function DetailBase(options) {
         this.options = options;
         this.errors = [];
@@ -93,12 +93,12 @@ var DetailBase = (function () {
         });
     };
     ;
+    __decorate([
+        Input(),
+        __metadata("design:type", Object)
+    ], DetailBase.prototype, "properties", void 0);
     return DetailBase;
 }());
 export { DetailBase };
-__decorate([
-    Input(),
-    __metadata("design:type", Object)
-], DetailBase.prototype, "properties", void 0);
 ;
 //# sourceMappingURL=detail-base.component.js.map

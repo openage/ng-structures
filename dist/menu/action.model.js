@@ -1,4 +1,4 @@
-var Action = (function () {
+var Action = /** @class */ (function () {
     function Action(obj) {
         if (!obj) {
             return;
@@ -11,6 +11,12 @@ var Action = (function () {
         }
         if (obj.icon) {
             this.icon = obj.icon;
+        }
+        if (obj.type) {
+            this.type = obj.type;
+        }
+        if (obj.value) {
+            this.value = obj.value;
         }
     }
     return Action;

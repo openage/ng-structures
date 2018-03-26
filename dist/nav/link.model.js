@@ -1,4 +1,4 @@
-var Link = (function () {
+var Link = /** @class */ (function () {
     function Link(obj) {
         this.index = 0;
         this.isActive = false;

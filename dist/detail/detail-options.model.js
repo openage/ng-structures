@@ -1,4 +1,4 @@
-var DetailOptions = (function () {
+var DetailOptions = /** @class */ (function () {
     function DetailOptions(obj) {
         this.fields = {
             id: 'id'

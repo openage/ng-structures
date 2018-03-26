@@ -1,4 +1,4 @@
-var FiltersOptions = (function () {
+var FiltersOptions = /** @class */ (function () {
     function FiltersOptions() {
     }
     return FiltersOptions;

@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-var Filter = (function () {
+var Filter = /** @class */ (function () {
     function Filter(param, filters) {
         var _this = this;
         this.filters = filters;

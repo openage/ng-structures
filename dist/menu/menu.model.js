@@ -1,4 +1,4 @@
-var Menu = (function () {
+var Menu = /** @class */ (function () {
     function Menu(items) {
         this.items = items;
     }

@@ -1,4 +1,4 @@
-var Nav = (function () {
+var Nav = /** @class */ (function () {
     function Nav(items) {
         this.items = items;
         this.current = items[0];

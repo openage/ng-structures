@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Filters } from '../filter/index';
 import { PageOptions } from '@open-age/ng-api';
-var PagerBaseComponent = (function () {
+var PagerBaseComponent = /** @class */ (function () {
     function PagerBaseComponent(options) {
         this.options = options;
         this.errors = [];

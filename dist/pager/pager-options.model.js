@@ -1,5 +1,5 @@
 import { PageOptions } from '@open-age/ng-api';
-var PagerOptions = (function () {
+var PagerOptions = /** @class */ (function () {
     function PagerOptions(obj) {
         var _this = this;
         this.maxPagesToShow = 10;
