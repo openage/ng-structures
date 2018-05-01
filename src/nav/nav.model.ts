@@ -1,10 +1,50 @@
 import { Link } from './link.model';
 
 export class Nav {
+    title: string;
     current: Link;
-    constructor(public items: Link[]) {
-        this.current = items[0];
-        this.current.isActive = true;
+    items: Link[];
+    constructor(obj?: {
+        title?: string,
+        permissions?: string[],
+        items?: any[],
+        current?: string | number
+    }) {
+        if (!obj) return;
+        this.title = obj.title;
+        this.items = [];
+        if (obj.items && obj.items.length) {
+            obj.items.forEach(item => {
+                let link = new Link(item);
+
+                if (!link.permissions || !link.permissions.length) {
+                    this.items.push(link);
+                    return;
+                }
+
+                // this link requires permissions
+                if (!obj.permissions || !obj.permissions.length) {
+                    // no permissions supplied
+                    return;
+                }
+
+                link.permissions.forEach(requiredPermission => {
+                    if (obj.permissions.find(permission => permission.toLowerCase() === requiredPermission.toLowerCase())) {
+                        this.items.push(link);
+                        return;
+                    }
+                });
+            });
+        }
+
+        if (obj.current) {
+            this.activate(obj.current);
+        } else {
+            this.current = this.items[0];
+            this.current.isActive = true;
+        }
+
+
     }
     activate(identifier: string | number | Link): Link {
         if (!identifier) {

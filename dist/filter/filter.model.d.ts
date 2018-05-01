@@ -2,6 +2,15 @@ import { IFilters } from './filters.interface';
 import { IPager } from '../pager/index';
 export declare class Filter {
     private filters;
+    control: {
+        title: string;
+        type: string;
+        options: {
+            title: string;
+            icon: string;
+            value: string;
+        }[];
+    };
     field: string;
     value?: any;
     operator: string;

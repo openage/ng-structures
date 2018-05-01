@@ -3,21 +3,13 @@ var Action = /** @class */ (function () {
         if (!obj) {
             return;
         }
-        if (obj.event) {
-            this.event = obj.event;
-        }
-        if (obj.title) {
-            this.title = obj.title;
-        }
-        if (obj.icon) {
-            this.icon = obj.icon;
-        }
-        if (obj.type) {
-            this.type = obj.type;
-        }
-        if (obj.value) {
-            this.value = obj.value;
-        }
+        this.event = obj.event;
+        this.title = obj.title;
+        this.icon = obj.icon;
+        this.type = obj.type;
+        this.value = obj.value;
+        this.options = obj.options;
+        this.display = obj.display;
     }
     return Action;
 }());

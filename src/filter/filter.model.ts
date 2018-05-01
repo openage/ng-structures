@@ -3,6 +3,11 @@ import { IFilters } from './filters.interface';
 import { IPager } from '../pager/index';
 
 export class Filter {
+    control: {
+        title: string,
+        type: string,
+        options: { title: string, icon: string, value: string }[]
+    };
     field: string;
     value?: any;
     operator = 'eq';
@@ -50,6 +55,8 @@ export class Filter {
         if (param.operator) {
             this.operator = param.operator;
         }
+
+        this.control = param.control;
 
         if (param.isSelected) {
             this.isSelected = param.isSelected;

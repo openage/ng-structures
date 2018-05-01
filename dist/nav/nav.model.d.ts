@@ -1,8 +1,14 @@
 import { Link } from './link.model';
 export declare class Nav {
-    items: Link[];
+    title: string;
     current: Link;
-    constructor(items: Link[]);
+    items: Link[];
+    constructor(obj?: {
+        title?: string;
+        permissions?: string[];
+        items?: any[];
+        current?: string | number;
+    });
     activate(identifier: string | number | Link): Link;
     reset(): Link;
 }

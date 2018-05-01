@@ -36,6 +36,7 @@ var Filter = /** @class */ (function () {
         if (param.operator) {
             this.operator = param.operator;
         }
+        this.control = param.control;
         if (param.isSelected) {
             this.isSelected = param.isSelected;
         }

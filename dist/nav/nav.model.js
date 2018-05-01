@@ -1,8 +1,38 @@
+import { Link } from './link.model';
 var Nav = /** @class */ (function () {
-    function Nav(items) {
-        this.items = items;
-        this.current = items[0];
-        this.current.isActive = true;
+    function Nav(obj) {
+        var _this = this;
+        if (!obj)
+            return;
+        this.title = obj.title;
+        this.items = [];
+        if (obj.items && obj.items.length) {
+            obj.items.forEach(function (item) {
+                var link = new Link(item);
+                if (!link.permissions || !link.permissions.length) {
+                    _this.items.push(link);
+                    return;
+                }
+                // this link requires permissions
+                if (!obj.permissions || !obj.permissions.length) {
+                    // no permissions supplied
+                    return;
+                }
+                link.permissions.forEach(function (requiredPermission) {
+                    if (obj.permissions.find(function (permission) { return permission.toLowerCase() === requiredPermission.toLowerCase(); })) {
+                        _this.items.push(link);
+                        return;
+                    }
+                });
+            });
+        }
+        if (obj.current) {
+            this.activate(obj.current);
+        }
+        else {
+            this.current = this.items[0];
+            this.current.isActive = true;
+        }
     }
     Nav.prototype.activate = function (identifier) {
         var _this = this;

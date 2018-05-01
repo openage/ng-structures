@@ -4,19 +4,25 @@ export class Action {
     icon: string;
     type: string;
     value: any;
+    options: any[]; // values for select etc
+    display: string; // hidden, disabled etc
 
     constructor(obj?: {
-        event: EventListener,
-        title: string,
+        event?: EventListener,
+        title?: string,
         icon?: string,
         type?: string,
-        value?: any
+        value?: any,
+        options?: any[],
+        display?: string
     }) {
         if (!obj) { return; }
-        if (obj.event) { this.event = obj.event; }
-        if (obj.title) { this.title = obj.title; }
-        if (obj.icon) { this.icon = obj.icon; }
-        if (obj.type) { this.type = obj.type; }
-        if (obj.value) { this.value = obj.value; }
+        this.event = obj.event;
+        this.title = obj.title;
+        this.icon = obj.icon;
+        this.type = obj.type;
+        this.value = obj.value;
+        this.options = obj.options;
+        this.display = obj.display;
     }
 }
