@@ -1,5 +1,5 @@
 export class Action {
-    event: EventListener;
+    event: (any) => void;
     title: string;
     icon: string;
     type: string;
@@ -8,7 +8,7 @@ export class Action {
     display: string; // hidden, disabled etc
 
     constructor(obj?: {
-        event?: EventListener,
+        event?: (any) => void,
         title?: string,
         icon?: string,
         type?: string,
