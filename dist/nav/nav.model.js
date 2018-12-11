@@ -5,6 +5,7 @@ var Nav = /** @class */ (function () {
         if (!obj)
             return;
         this.title = obj.title;
+        this.icon = obj.icon;
         this.items = [];
         if (obj.items && obj.items.length) {
             obj.items.forEach(function (item) {

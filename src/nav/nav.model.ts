@@ -1,17 +1,20 @@
 import { Link } from './link.model';
 
 export class Nav {
+    icon: string;
     title: string;
     current: Link;
     items: Link[];
     constructor(obj?: {
         title?: string,
+        icon?: string,
         permissions?: string[],
         items?: any[],
         current?: string | number
     }) {
         if (!obj) return;
         this.title = obj.title;
+        this.icon = obj.icon;
         this.items = [];
         if (obj.items && obj.items.length) {
             obj.items.forEach(item => {

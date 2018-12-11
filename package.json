@@ -1,11 +1,12 @@
 {
     "name": "@open-age/ng-structures",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "structures to create angular application",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "scripts": {
         "test": "test",
+        "build": "tsc",
         "release:patch": "npm version patch",
         "publish": "npm publish --access public"
     },
