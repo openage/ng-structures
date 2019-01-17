@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { IFilters } from './filters.interface';
 import { IPager } from '../pager/index';
 
@@ -74,13 +73,13 @@ export class Filter {
         if (!this.value) {
             return true;
         }
-        if (_.isNumber(this.value) && this.value === 0) {
+        if ((typeof this.value === 'number') && this.value === 0) {
             return true;
         }
-        if (_.isString(this.value) && (this.value === '0' || this.value === '' || this.value.match(/^ *$/) !== null)) {
+        if ((typeof this.value === 'string') && (this.value === '0' || this.value === '' || this.value.match(/^ *$/) !== null)) {
             return true;
         }
-        if (_.isArray(this.value) && _.isEmpty(this.value)) {
+        if (Array.isArray(this.value) && !this.value.length) {
             return true;
         }
 

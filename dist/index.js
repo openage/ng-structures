@@ -3,4 +3,4 @@ export * from './filter';
 export * from './menu';
 export * from './nav';
 export * from './pager';
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=../src/dist/index.js.map

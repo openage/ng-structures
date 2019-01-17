@@ -1,1 +1,1 @@
-//# sourceMappingURL=pager.interface.js.map
+//# sourceMappingURL=../../src/dist/pager/pager.interface.js.map

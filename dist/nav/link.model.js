@@ -17,4 +17,4 @@ var Link = /** @class */ (function () {
     return Link;
 }());
 export { Link };
-//# sourceMappingURL=link.model.js.map
+//# sourceMappingURL=../../src/dist/nav/link.model.js.map

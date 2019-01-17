@@ -1,4 +1,6 @@
-import { PageOptions } from '@open-age/ng-api';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var ng_api_1 = require("@open-age/ng-api");
 var PagerOptions = /** @class */ (function () {
     function PagerOptions(obj) {
         var _this = this;
@@ -20,7 +22,7 @@ var PagerOptions = /** @class */ (function () {
             this.fields = obj.fields;
         }
         if (obj.pageOptions) {
-            this.pageOptions = new PageOptions(obj.pageOptions);
+            this.pageOptions = new ng_api_1.PageOptions(obj.pageOptions);
         }
         if (obj.filters) {
             obj.filters.forEach(function (element) {
@@ -30,5 +32,4 @@ var PagerOptions = /** @class */ (function () {
     }
     return PagerOptions;
 }());
-export { PagerOptions };
-//# sourceMappingURL=../../src/dist/pager/pager-options.model.js.map
+exports.PagerOptions = PagerOptions;

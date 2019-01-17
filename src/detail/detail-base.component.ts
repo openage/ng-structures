@@ -1,8 +1,9 @@
-import * as _ from 'lodash';
-import * as moment from 'moment';
 import { DetailOptions } from './detail-options.model';
-import { Observable } from 'rxjs/Rx';
+import { Observable, pipe } from 'rxjs';
 import { Input } from '@angular/core';
+
+import { finalize, map } from 'rxjs/operators'
+import { IApi } from '@open-age/ng-api';
 
 
 export class DetailBase<TModel> {
@@ -13,7 +14,14 @@ export class DetailBase<TModel> {
   id: number | string;
   isProcessing = false;
 
-  constructor(private options: DetailOptions<TModel>) {
+  constructor(private options: {
+    api: IApi<TModel>,
+    properties?: TModel,
+    watch?: number,
+    fields?: {
+      id: 'id' | string
+    }
+  } | DetailOptions<TModel>) {
     if (options.properties) {
       this.originalModel = JSON.parse(JSON.stringify(options.properties));
       this.setModel(options.properties);
@@ -31,13 +39,19 @@ export class DetailBase<TModel> {
   get(id: string | number): Observable<TModel> {
     this.isProcessing = true;
 
-    return this.options.api.get(id).map(data => {
+    let options: any = {}
+
+    if (!(this.options instanceof DetailOptions) && this.options.watch) {
+      options.watch = this.options.watch
+    }
+
+    return this.options.api.get(id, options).pipe(map(data => {
       this.setModel(data);
       return data;
-    }).finally(() => {
+    })).pipe(finalize(() => {
       this.isProcessing = false;
       return this;
-    });
+    }));
   };
 
   set(data: TModel) {
@@ -59,36 +73,36 @@ export class DetailBase<TModel> {
   create(model?: TModel): Observable<TModel> {
     this.isProcessing = true;
     return this.options.api.create(this.properties)
-      .map(data => {
+      .pipe(map(data => {
         this.setModel(data);
         return data;
-      }).finally(() => {
+      })).pipe(finalize(() => {
         this.isProcessing = false;
         return this;
-      });
+      }));
   };
 
   update(): Observable<TModel> {
     this.isProcessing = true;
     const id = this.properties[this.options.fields.id];
     return this.options.api.update(id, this.properties)
-      .map(data => {
+      .pipe(map(data => {
         this.setModel(data);
         return data;
-      }).finally(() => {
+      })).pipe(finalize(() => {
         this.isProcessing = false;
         return this;
-      });
+      }));
   };
 
   remove(): Observable<void> {
     this.isProcessing = true;
     return this.options.api.remove(this.id)
-      .map(() => {
+      .pipe(map(() => {
         return;
-      }).finally(() => {
+      })).pipe(finalize(() => {
         this.isProcessing = false;
         return this;
-      });
+      }));
   };
 };

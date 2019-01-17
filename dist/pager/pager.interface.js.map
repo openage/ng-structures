@@ -1,1 +1,1 @@
-{"version":3,"file":"pager.interface.js","sourceRoot":"","sources":["../../src/pager/pager.interface.ts"],"names":[],"mappings":""}
+{"version":3,"file":"pager.interface.js","sourceRoot":"./src/","sources":["pager/pager.interface.ts"],"names":[],"mappings":""}

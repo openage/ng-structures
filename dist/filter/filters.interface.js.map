@@ -1,1 +1,1 @@
-{"version":3,"file":"filters.interface.js","sourceRoot":"","sources":["../../src/filter/filters.interface.ts"],"names":[],"mappings":""}
+{"version":3,"file":"filters.interface.js","sourceRoot":"./src/","sources":["filter/filters.interface.ts"],"names":[],"mappings":""}

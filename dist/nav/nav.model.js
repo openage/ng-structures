@@ -73,4 +73,4 @@ var Nav = /** @class */ (function () {
     return Nav;
 }());
 export { Nav };
-//# sourceMappingURL=nav.model.js.map
+//# sourceMappingURL=../../src/dist/nav/nav.model.js.map

@@ -5,4 +5,4 @@ var Menu = /** @class */ (function () {
     return Menu;
 }());
 export { Menu };
-//# sourceMappingURL=menu.model.js.map
+//# sourceMappingURL=../../src/dist/menu/menu.model.js.map

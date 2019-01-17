@@ -7,7 +7,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+import { DetailOptions } from './detail-options.model';
 import { Input } from '@angular/core';
+import { finalize, map } from 'rxjs/operators';
 var DetailBase = /** @class */ (function () {
     function DetailBase(options) {
         this.options = options;
@@ -29,13 +31,17 @@ var DetailBase = /** @class */ (function () {
     DetailBase.prototype.get = function (id) {
         var _this = this;
         this.isProcessing = true;
-        return this.options.api.get(id).map(function (data) {
+        var options = {};
+        if (!(this.options instanceof DetailOptions) && this.options.watch) {
+            options.watch = this.options.watch;
+        }
+        return this.options.api.get(id, options).pipe(map(function (data) {
             _this.setModel(data);
             return data;
-        }).finally(function () {
+        })).pipe(finalize(function () {
             _this.isProcessing = false;
             return _this;
-        });
+        }));
     };
     ;
     DetailBase.prototype.set = function (data) {
@@ -58,13 +64,13 @@ var DetailBase = /** @class */ (function () {
         var _this = this;
         this.isProcessing = true;
         return this.options.api.create(this.properties)
-            .map(function (data) {
+            .pipe(map(function (data) {
             _this.setModel(data);
             return data;
-        }).finally(function () {
+        })).pipe(finalize(function () {
             _this.isProcessing = false;
             return _this;
-        });
+        }));
     };
     ;
     DetailBase.prototype.update = function () {
@@ -72,25 +78,25 @@ var DetailBase = /** @class */ (function () {
         this.isProcessing = true;
         var id = this.properties[this.options.fields.id];
         return this.options.api.update(id, this.properties)
-            .map(function (data) {
+            .pipe(map(function (data) {
             _this.setModel(data);
             return data;
-        }).finally(function () {
+        })).pipe(finalize(function () {
             _this.isProcessing = false;
             return _this;
-        });
+        }));
     };
     ;
     DetailBase.prototype.remove = function () {
         var _this = this;
         this.isProcessing = true;
         return this.options.api.remove(this.id)
-            .map(function () {
+            .pipe(map(function () {
             return;
-        }).finally(function () {
+        })).pipe(finalize(function () {
             _this.isProcessing = false;
             return _this;
-        });
+        }));
     };
     ;
     __decorate([
@@ -101,4 +107,4 @@ var DetailBase = /** @class */ (function () {
 }());
 export { DetailBase };
 ;
-//# sourceMappingURL=detail-base.component.js.map
+//# sourceMappingURL=../../src/dist/detail/detail-base.component.js.map

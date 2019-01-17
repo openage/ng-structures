@@ -1,6 +1,6 @@
 import { IPager } from './pager.interface';
 import { PagerOptions } from './pager-options.model';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs';
 import { Filters } from '../filter/index';
 import { PageOptions } from '@open-age/ng-api';
 export declare class PagerBaseComponent<TModel> implements IPager {
@@ -15,7 +15,7 @@ export declare class PagerBaseComponent<TModel> implements IPager {
     items: Array<TModel>;
     stats: any;
     constructor(options: PagerOptions<TModel>);
-    private convertToPageOption(pageNo);
+    private convertToPageOption;
     fetch(options?: PageOptions): Observable<void>;
     add(param: TModel): this;
     remove(item: TModel): void;

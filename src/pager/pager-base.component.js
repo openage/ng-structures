@@ -1,6 +1,15 @@
-import { Filters } from '../filter/index';
-import { PageOptions } from '@open-age/ng-api';
-import { finalize, map } from 'rxjs/operators';
+"use strict";
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+var _ = __importStar(require("lodash"));
+var index_1 = require("../filter/index");
+var ng_api_1 = require("@open-age/ng-api");
 var PagerBaseComponent = /** @class */ (function () {
     function PagerBaseComponent(options) {
         this.options = options;
@@ -11,16 +20,16 @@ var PagerBaseComponent = /** @class */ (function () {
         this.totalPages = 0;
         this.items = [];
         if (!options.pageOptions) {
-            options.pageOptions = new PageOptions();
+            options.pageOptions = new ng_api_1.PageOptions();
         }
-        this.filters = new Filters({
+        this.filters = new index_1.Filters({
             associatedList: this,
             filters: options.filters,
             location: options.location
         });
     }
     PagerBaseComponent.prototype.convertToPageOption = function (pageNo) {
-        var options = new PageOptions();
+        var options = new ng_api_1.PageOptions();
         options.offset = (pageNo - 1) * this.options.pageOptions.limit;
         options.limit = this.options.pageOptions.limit;
         return options;
@@ -29,25 +38,25 @@ var PagerBaseComponent = /** @class */ (function () {
         var _this = this;
         this.isProcessing = true;
         if (!options) {
-            options = new PageOptions();
+            options = new ng_api_1.PageOptions();
             if (!this.options.pageOptions.noPaging) {
                 options.offset = (this.currentPageNo - 1) * this.options.pageOptions.limit;
                 options.limit = this.options.pageOptions.limit;
             }
         }
         this.filters.getQuery();
-        return this.options.api.search(this.filters.getQuery(), options).pipe(map(function (page) {
+        return this.options.api.search(this.filters.getQuery(), options).map(function (page) {
             _this.isProcessing = false;
             var items = [];
             page.stats = page.stats || {};
-            page.items.forEach(function (item) {
+            _(page.items).each(function (item) {
                 items.push(item);
             });
             _this.items = items;
             _this.total = page.total || page.stats.total || _this.items.length;
             _this.currentPageNo = page.pageNo;
             _this.totalPages = Math.ceil(_this.total / _this.options.pageOptions.limit);
-        })).pipe(finalize(function () { _this.isProcessing = false; }));
+        }).finally(function () { _this.isProcessing = false; });
     };
     PagerBaseComponent.prototype.add = function (param) {
         this.items.push(param);
@@ -145,5 +154,4 @@ var PagerBaseComponent = /** @class */ (function () {
     ;
     return PagerBaseComponent;
 }());
-export { PagerBaseComponent };
-//# sourceMappingURL=../../src/dist/pager/pager-base.component.js.map
+exports.PagerBaseComponent = PagerBaseComponent;

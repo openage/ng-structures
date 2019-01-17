@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Location } from '@angular/common';
 import { URLSearchParams } from '@angular/http';
 
@@ -16,11 +15,13 @@ export class Filters implements IFilters {
     location: Location;
 
     constructor(private options: FiltersOptions) {
-        _.each(options.filters, (item) => {
-            const model = new Filter(item, this);
-            this.items.push(model);
-            this.properties[model.field] = model;
-        });
+        if (options.filters) {
+            options.filters.forEach(item => {
+                const model = new Filter(item, this);
+                this.items.push(model);
+                this.properties[model.field] = model;
+            });
+        }
         this.location = options.location;
     }
 
@@ -29,7 +30,7 @@ export class Filters implements IFilters {
     }
 
     reset() {
-        _.each(this.items, (item) => {
+        this.items.forEach(item => {
             item.reset();
         });
         return this.apply();
@@ -53,9 +54,9 @@ export class Filters implements IFilters {
 
         let count = 0;
 
-        _.each(this.items, (item) => {
+        this.items.forEach(item => {
             if (urlSearchParams && !item.skipUrl) {
-                const value = _.isDate(item.value) ? moment(item.value).toJSON() : item.value;
+                const value = (item.value instanceof Date) ? moment(item.value).toJSON() : item.value;
                 urlSearchParams.set(item.field, item.isEmpty() ? null : value);
             }
 

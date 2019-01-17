@@ -1,11 +1,12 @@
-import * as _ from 'lodash';
 import { Location } from '@angular/common';
 
 import { IPager } from './pager.interface';
 import { PagerOptions } from './pager-options.model';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs';
 import { Filters } from '../filter/index';
 import { PageOptions } from '@open-age/ng-api';
+import { finalize, map } from 'rxjs/operators'
+
 
 export class PagerBaseComponent<TModel> implements IPager {
 
@@ -53,11 +54,11 @@ export class PagerBaseComponent<TModel> implements IPager {
 
         this.filters.getQuery();
 
-        return this.options.api.search(this.filters.getQuery(), options).map(page => {
+        return this.options.api.search(this.filters.getQuery(), options).pipe(map(page => {
             this.isProcessing = false;
             const items: TModel[] = [];
             page.stats = page.stats || {};
-            _(page.items).each((item) => {
+            page.items.forEach((item) => {
                 items.push(item);
             });
 
@@ -68,7 +69,7 @@ export class PagerBaseComponent<TModel> implements IPager {
             this.totalPages = Math.ceil(this.total / this.options.pageOptions.limit);
 
 
-        }).finally(() => { this.isProcessing = false; });
+        })).pipe(finalize(() => { this.isProcessing = false; }));
     }
 
     add(param: TModel) {

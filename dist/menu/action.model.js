@@ -14,4 +14,4 @@ var Action = /** @class */ (function () {
     return Action;
 }());
 export { Action };
-//# sourceMappingURL=action.model.js.map
+//# sourceMappingURL=../../src/dist/menu/action.model.js.map

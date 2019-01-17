@@ -1,5 +1,5 @@
 export declare class Action {
-    event: (any) => void;
+    event: (any: any) => void;
     title: string;
     icon: string;
     type: string;
@@ -7,7 +7,7 @@ export declare class Action {
     options: any[];
     display: string;
     constructor(obj?: {
-        event?: (any) => void;
+        event?: (any: any) => void;
         title?: string;
         icon?: string;
         type?: string;

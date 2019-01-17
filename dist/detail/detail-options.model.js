@@ -19,4 +19,4 @@ var DetailOptions = /** @class */ (function () {
     return DetailOptions;
 }());
 export { DetailOptions };
-//# sourceMappingURL=detail-options.model.js.map
+//# sourceMappingURL=../../src/dist/detail/detail-options.model.js.map
