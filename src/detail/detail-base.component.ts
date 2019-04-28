@@ -18,6 +18,8 @@ export class DetailBase<TModel> {
     api: IApi<TModel>,
     properties?: TModel,
     watch?: number,
+    cache?: IApi<TModel>,
+    map?: (obj: any) => TModel,
     fields?: {
       id: 'id' | string
     }
@@ -38,15 +40,14 @@ export class DetailBase<TModel> {
 
   get(id: string | number): Observable<TModel> {
     this.isProcessing = true;
-
-    let options: any = {}
-
-    if (!(this.options instanceof DetailOptions) && this.options.watch) {
-      options.watch = this.options.watch
-    }
-
-    return this.options.api.get(id, options).pipe(map(data => {
+    return this.options.api.get(id, {
+      watch: this.options.watch,
+      map: this.options.map
+    }).pipe(map(data => {
       this.setModel(data);
+      if (this.options.cache) {
+        this.options.cache.update(id, data).subscribe();
+      }
       return data;
     })).pipe(finalize(() => {
       this.isProcessing = false;
@@ -75,6 +76,9 @@ export class DetailBase<TModel> {
     return this.options.api.create(this.properties)
       .pipe(map(data => {
         this.setModel(data);
+        if (this.options.cache && this.options.fields.id) {
+          this.options.cache.update(data[this.options.fields.id], data).subscribe();
+        }
         return data;
       })).pipe(finalize(() => {
         this.isProcessing = false;
@@ -88,6 +92,9 @@ export class DetailBase<TModel> {
     return this.options.api.update(id, this.properties)
       .pipe(map(data => {
         this.setModel(data);
+        if (this.options.cache) {
+          this.options.cache.update(this.id, data).subscribe();
+        }
         return data;
       })).pipe(finalize(() => {
         this.isProcessing = false;
@@ -99,6 +106,9 @@ export class DetailBase<TModel> {
     this.isProcessing = true;
     return this.options.api.remove(this.id)
       .pipe(map(() => {
+        if (this.options.cache) {
+          this.options.cache.remove(this.id).subscribe();
+        }
         return;
       })).pipe(finalize(() => {
         this.isProcessing = false;

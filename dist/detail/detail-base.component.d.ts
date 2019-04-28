@@ -12,6 +12,8 @@ export declare class DetailBase<TModel> {
         api: IApi<TModel>;
         properties?: TModel;
         watch?: number;
+        cache?: IApi<TModel>;
+        map?: (obj: any) => TModel;
         fields?: {
             id: 'id' | string;
         };

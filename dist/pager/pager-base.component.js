@@ -1,3 +1,4 @@
+import { PagerOptions } from './pager-options.model';
 import { Filters } from '../filter/index';
 import { PageOptions } from '@open-age/ng-api';
 import { finalize, map } from 'rxjs/operators';
@@ -10,6 +11,9 @@ var PagerBaseComponent = /** @class */ (function () {
         this.currentPageNo = 1;
         this.totalPages = 0;
         this.items = [];
+        if (!(options instanceof PagerOptions)) {
+            options = new PagerOptions(options);
+        }
         if (!options.pageOptions) {
             options.pageOptions = new PageOptions();
         }
@@ -29,19 +33,30 @@ var PagerBaseComponent = /** @class */ (function () {
         var _this = this;
         this.isProcessing = true;
         if (!options) {
-            options = new PageOptions();
-            if (!this.options.pageOptions.noPaging) {
+            options = {};
+            if (this.options.pageOptions.limit) {
                 options.offset = (this.currentPageNo - 1) * this.options.pageOptions.limit;
                 options.limit = this.options.pageOptions.limit;
             }
         }
+        var mapFn = this.options.map;
+        if (!(options instanceof PageOptions) && options.map) {
+            mapFn = options.map;
+        }
         this.filters.getQuery();
-        return this.options.api.search(this.filters.getQuery(), options).pipe(map(function (page) {
+        return this.options.api.search(this.filters.getQuery(), {
+            limit: options.limit,
+            offset: options.offset,
+            map: mapFn
+        }).pipe(map(function (page) {
             _this.isProcessing = false;
             var items = [];
             page.stats = page.stats || {};
             page.items.forEach(function (item) {
                 items.push(item);
+                if (_this.options.cache && _this.options.fields.id) {
+                    _this.options.cache.update(item[_this.options.fields.id], item).subscribe();
+                }
             });
             _this.items = items;
             _this.total = page.total || page.stats.total || _this.items.length;
@@ -127,7 +142,7 @@ var PagerBaseComponent = /** @class */ (function () {
             pageNo = this.totalPages;
             return;
         }
-        return this.fetch(this.convertToPageOption(pageNo));
+        return this.fetch(this.convertToPageOption(pageNo)).subscribe();
     };
     PagerBaseComponent.prototype.showPrevious = function () {
         if (this.isProcessing || this.currentPageNo <= 1) {

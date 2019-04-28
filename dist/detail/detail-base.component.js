@@ -7,7 +7,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { DetailOptions } from './detail-options.model';
 import { Input } from '@angular/core';
 import { finalize, map } from 'rxjs/operators';
 var DetailBase = /** @class */ (function () {
@@ -31,12 +30,14 @@ var DetailBase = /** @class */ (function () {
     DetailBase.prototype.get = function (id) {
         var _this = this;
         this.isProcessing = true;
-        var options = {};
-        if (!(this.options instanceof DetailOptions) && this.options.watch) {
-            options.watch = this.options.watch;
-        }
-        return this.options.api.get(id, options).pipe(map(function (data) {
+        return this.options.api.get(id, {
+            watch: this.options.watch,
+            map: this.options.map
+        }).pipe(map(function (data) {
             _this.setModel(data);
+            if (_this.options.cache) {
+                _this.options.cache.update(id, data).subscribe();
+            }
             return data;
         })).pipe(finalize(function () {
             _this.isProcessing = false;
@@ -66,6 +67,9 @@ var DetailBase = /** @class */ (function () {
         return this.options.api.create(this.properties)
             .pipe(map(function (data) {
             _this.setModel(data);
+            if (_this.options.cache && _this.options.fields.id) {
+                _this.options.cache.update(data[_this.options.fields.id], data).subscribe();
+            }
             return data;
         })).pipe(finalize(function () {
             _this.isProcessing = false;
@@ -80,6 +84,9 @@ var DetailBase = /** @class */ (function () {
         return this.options.api.update(id, this.properties)
             .pipe(map(function (data) {
             _this.setModel(data);
+            if (_this.options.cache) {
+                _this.options.cache.update(_this.id, data).subscribe();
+            }
             return data;
         })).pipe(finalize(function () {
             _this.isProcessing = false;
@@ -92,6 +99,9 @@ var DetailBase = /** @class */ (function () {
         this.isProcessing = true;
         return this.options.api.remove(this.id)
             .pipe(map(function () {
+            if (_this.options.cache) {
+                _this.options.cache.remove(_this.id).subscribe();
+            }
             return;
         })).pipe(finalize(function () {
             _this.isProcessing = false;

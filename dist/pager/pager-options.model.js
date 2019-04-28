@@ -22,11 +22,17 @@ var PagerOptions = /** @class */ (function () {
         if (obj.pageOptions) {
             this.pageOptions = new PageOptions(obj.pageOptions);
         }
+        if (obj.properties) {
+            this.properties = obj.properties;
+        }
         if (obj.filters) {
             obj.filters.forEach(function (element) {
                 _this.filters.push(element);
             });
         }
+        this.cache = obj.cache;
+        this.watch = obj.watch;
+        this.map = obj.map;
     }
     return PagerOptions;
 }());

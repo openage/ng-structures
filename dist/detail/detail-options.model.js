@@ -6,15 +6,16 @@ var DetailOptions = /** @class */ (function () {
         if (!obj) {
             return;
         }
-        if (obj.api) {
-            this.api = obj.api;
-        }
         if (obj.properties) {
             this.properties = obj.properties;
         }
         if (obj.fields) {
             this.fields = obj.fields;
         }
+        this.api = obj.api;
+        this.cache = obj.cache;
+        this.watch = obj.watch;
+        this.map = obj.map;
     }
     return DetailOptions;
 }());

@@ -4,7 +4,7 @@ import { IPager } from './pager.interface';
 import { PagerOptions } from './pager-options.model';
 import { Observable } from 'rxjs';
 import { Filters } from '../filter/index';
-import { PageOptions } from '@open-age/ng-api';
+import { PageOptions, IApi } from '@open-age/ng-api';
 import { finalize, map } from 'rxjs/operators'
 
 
@@ -23,8 +23,29 @@ export class PagerBaseComponent<TModel> implements IPager {
     stats: any;
 
 
-    constructor(private options: PagerOptions<TModel>) {
+    constructor(private options: {
+        api: IApi<TModel>,
+        properties?: TModel,
+        fields?: {
+            id: 'id' | string,
+            timeStamp: 'timeStamp' | string
+        },
+        watch?: number,
+        cache?: IApi<TModel>,
+        map?: (obj: any) => TModel,
+        pageOptions?: {
+            limit: number,
+            offset?: number
+        } | PageOptions,
+        maxPagesToShow?: number,
+        filters?: any[],
+        location?: Location
+    } | PagerOptions<TModel>) {
         this.items = [];
+
+        if (!(options instanceof PagerOptions)) {
+            options = new PagerOptions<TModel>(options);
+        }
         if (!options.pageOptions) {
             options.pageOptions = new PageOptions();
         }
@@ -42,24 +63,41 @@ export class PagerBaseComponent<TModel> implements IPager {
         return options;
     }
 
-    fetch(options?: PageOptions) {
+    fetch(options?: PageOptions | {
+        offset?: number;
+        limit?: number;
+        map?: (obj: any) => TModel;
+    }) {
         this.isProcessing = true;
         if (!options) {
-            options = new PageOptions()
-            if (!this.options.pageOptions.noPaging) {
+            options = {}
+            if (this.options.pageOptions.limit) {
                 options.offset = (this.currentPageNo - 1) * this.options.pageOptions.limit;
                 options.limit = this.options.pageOptions.limit;
             }
         }
 
+        let mapFn = this.options.map
+
+        if (!(options instanceof PageOptions) && options.map) {
+            mapFn = options.map;
+        }
+
         this.filters.getQuery();
 
-        return this.options.api.search(this.filters.getQuery(), options).pipe(map(page => {
+        return this.options.api.search(this.filters.getQuery(), {
+            limit: options.limit,
+            offset: options.offset,
+            map: mapFn
+        }).pipe(map(page => {
             this.isProcessing = false;
             const items: TModel[] = [];
             page.stats = page.stats || {};
             page.items.forEach((item) => {
                 items.push(item);
+                if (this.options.cache && this.options.fields.id) {
+                    this.options.cache.update(item[this.options.fields.id], item).subscribe();
+                }
             });
 
             this.items = items;
@@ -157,7 +195,7 @@ export class PagerBaseComponent<TModel> implements IPager {
             return;
         }
 
-        return this.fetch(this.convertToPageOption(pageNo));
+        return this.fetch(this.convertToPageOption(pageNo)).subscribe();
     }
 
     showPrevious() {
