@@ -71,7 +71,7 @@ export class PagerBaseComponent<TModel> implements IPager {
         this.isProcessing = true;
         if (!options) {
             options = {}
-            if (this.options.pageOptions.limit) {
+            if (this.options.pageOptions && this.options.pageOptions.limit) {
                 options.offset = (this.currentPageNo - 1) * this.options.pageOptions.limit;
                 options.limit = this.options.pageOptions.limit;
             }
