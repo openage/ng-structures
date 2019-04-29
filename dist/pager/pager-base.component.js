@@ -25,8 +25,10 @@ var PagerBaseComponent = /** @class */ (function () {
     }
     PagerBaseComponent.prototype.convertToPageOption = function (pageNo) {
         var options = new PageOptions();
-        options.offset = (pageNo - 1) * this.options.pageOptions.limit;
-        options.limit = this.options.pageOptions.limit;
+        if (this.options.pageOptions) {
+            options.offset = (pageNo - 1) * this.options.pageOptions.limit;
+            options.limit = this.options.pageOptions.limit;
+        }
         return options;
     };
     PagerBaseComponent.prototype.fetch = function (options) {
@@ -61,7 +63,12 @@ var PagerBaseComponent = /** @class */ (function () {
             _this.items = items;
             _this.total = page.total || page.stats.total || _this.items.length;
             _this.currentPageNo = page.pageNo;
-            _this.totalPages = Math.ceil(_this.total / _this.options.pageOptions.limit);
+            if (_this.options.pageOptions) {
+                _this.totalPages = Math.ceil(_this.total / _this.options.pageOptions.limit);
+            }
+            else {
+                _this.totalPages = 1;
+            }
         })).pipe(finalize(function () { _this.isProcessing = false; }));
     };
     PagerBaseComponent.prototype.add = function (param) {

@@ -58,8 +58,10 @@ export class PagerBaseComponent<TModel> implements IPager {
 
     private convertToPageOption(pageNo: number) {
         const options = new PageOptions()
-        options.offset = (pageNo - 1) * this.options.pageOptions.limit;
-        options.limit = this.options.pageOptions.limit;
+        if (this.options.pageOptions) {
+            options.offset = (pageNo - 1) * this.options.pageOptions.limit;
+            options.limit = this.options.pageOptions.limit;
+        }
         return options;
     }
 
@@ -104,7 +106,12 @@ export class PagerBaseComponent<TModel> implements IPager {
             this.total = page.total || page.stats.total || this.items.length;
             this.currentPageNo = page.pageNo;
 
-            this.totalPages = Math.ceil(this.total / this.options.pageOptions.limit);
+            if (this.options.pageOptions) {
+                this.totalPages = Math.ceil(this.total / this.options.pageOptions.limit);
+            } else {
+                this.totalPages = 1
+            }
+
 
 
         })).pipe(finalize(() => { this.isProcessing = false; }));
