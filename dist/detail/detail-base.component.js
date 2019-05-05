@@ -7,11 +7,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Input } from '@angular/core';
+import { Input, EventEmitter, Output } from '@angular/core';
 import { finalize, map } from 'rxjs/operators';
 var DetailBase = /** @class */ (function () {
     function DetailBase(options) {
         this.options = options;
+        this.fetched = new EventEmitter();
+        this.created = new EventEmitter();
+        this.updated = new EventEmitter();
+        this.removed = new EventEmitter();
         this.errors = [];
         this.isProcessing = false;
         if (options.properties) {
@@ -38,6 +42,7 @@ var DetailBase = /** @class */ (function () {
             if (_this.options.cache) {
                 _this.options.cache.update(id, data).subscribe();
             }
+            _this.fetched.emit(_this.properties);
             return data;
         })).pipe(finalize(function () {
             _this.isProcessing = false;
@@ -70,6 +75,7 @@ var DetailBase = /** @class */ (function () {
             if (_this.options.cache && _this.options.fields.id) {
                 _this.options.cache.update(data[_this.options.fields.id], data).subscribe();
             }
+            _this.created.emit(_this.properties);
             return data;
         })).pipe(finalize(function () {
             _this.isProcessing = false;
@@ -87,6 +93,7 @@ var DetailBase = /** @class */ (function () {
             if (_this.options.cache) {
                 _this.options.cache.update(_this.id, data).subscribe();
             }
+            _this.updated.emit(_this.properties);
             return data;
         })).pipe(finalize(function () {
             _this.isProcessing = false;
@@ -102,6 +109,7 @@ var DetailBase = /** @class */ (function () {
             if (_this.options.cache) {
                 _this.options.cache.remove(_this.id).subscribe();
             }
+            _this.removed.emit(_this.properties);
             return;
         })).pipe(finalize(function () {
             _this.isProcessing = false;
@@ -113,6 +121,22 @@ var DetailBase = /** @class */ (function () {
         Input(),
         __metadata("design:type", Object)
     ], DetailBase.prototype, "properties", void 0);
+    __decorate([
+        Output(),
+        __metadata("design:type", EventEmitter)
+    ], DetailBase.prototype, "fetched", void 0);
+    __decorate([
+        Output(),
+        __metadata("design:type", EventEmitter)
+    ], DetailBase.prototype, "created", void 0);
+    __decorate([
+        Output(),
+        __metadata("design:type", EventEmitter)
+    ], DetailBase.prototype, "updated", void 0);
+    __decorate([
+        Output(),
+        __metadata("design:type", EventEmitter)
+    ], DetailBase.prototype, "removed", void 0);
     return DetailBase;
 }());
 export { DetailBase };

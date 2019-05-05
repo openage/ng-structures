@@ -1,10 +1,15 @@
 import { DetailOptions } from './detail-options.model';
 import { Observable } from 'rxjs';
+import { EventEmitter } from '@angular/core';
 import { IApi } from '@open-age/ng-api';
 export declare class DetailBase<TModel> {
     private options;
     private originalModel;
     properties: TModel;
+    fetched: EventEmitter<TModel>;
+    created: EventEmitter<TModel>;
+    updated: EventEmitter<TModel>;
+    removed: EventEmitter<TModel>;
     errors: string[];
     id: number | string;
     isProcessing: boolean;

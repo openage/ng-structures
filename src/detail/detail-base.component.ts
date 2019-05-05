@@ -1,7 +1,6 @@
 import { DetailOptions } from './detail-options.model';
 import { Observable, pipe } from 'rxjs';
-import { Input } from '@angular/core';
-
+import { Input, EventEmitter, Output } from '@angular/core';
 import { finalize, map } from 'rxjs/operators'
 import { IApi } from '@open-age/ng-api';
 
@@ -9,7 +8,21 @@ import { IApi } from '@open-age/ng-api';
 export class DetailBase<TModel> {
 
   private originalModel: TModel;
-  @Input() properties: TModel
+  @Input()
+  properties: TModel
+
+  @Output()
+  fetched: EventEmitter<TModel> = new EventEmitter();
+
+  @Output()
+  created: EventEmitter<TModel> = new EventEmitter();
+
+  @Output()
+  updated: EventEmitter<TModel> = new EventEmitter();
+
+  @Output()
+  removed: EventEmitter<TModel> = new EventEmitter();
+
   errors: string[] = [];
   id: number | string;
   isProcessing = false;
@@ -48,6 +61,7 @@ export class DetailBase<TModel> {
       if (this.options.cache) {
         this.options.cache.update(id, data).subscribe();
       }
+      this.fetched.emit(this.properties);
       return data;
     })).pipe(finalize(() => {
       this.isProcessing = false;
@@ -79,6 +93,7 @@ export class DetailBase<TModel> {
         if (this.options.cache && this.options.fields.id) {
           this.options.cache.update(data[this.options.fields.id], data).subscribe();
         }
+        this.created.emit(this.properties);
         return data;
       })).pipe(finalize(() => {
         this.isProcessing = false;
@@ -95,6 +110,7 @@ export class DetailBase<TModel> {
         if (this.options.cache) {
           this.options.cache.update(this.id, data).subscribe();
         }
+        this.updated.emit(this.properties);
         return data;
       })).pipe(finalize(() => {
         this.isProcessing = false;
@@ -109,6 +125,7 @@ export class DetailBase<TModel> {
         if (this.options.cache) {
           this.options.cache.remove(this.id).subscribe();
         }
+        this.removed.emit(this.properties);
         return;
       })).pipe(finalize(() => {
         this.isProcessing = false;

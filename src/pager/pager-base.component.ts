@@ -1,14 +1,31 @@
 import { Location } from '@angular/common';
 
-import { IPager } from './pager.interface';
+import { IPager, IPage } from './pager.interface';
 import { PagerOptions } from './pager-options.model';
-import { Observable } from 'rxjs';
 import { Filters } from '../filter/index';
-import { PageOptions, IApi } from '@open-age/ng-api';
+import { PageOptions, IApi, Page } from '@open-age/ng-api';
 import { finalize, map } from 'rxjs/operators'
+import { Output, EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs';
 
 
-export class PagerBaseComponent<TModel> implements IPager {
+export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
+
+    @Output()
+    fetched: EventEmitter<IPage<TModel>> = new EventEmitter();
+
+    @Output()
+    selected: EventEmitter<TModel> = new EventEmitter();
+
+    @Output()
+    created: EventEmitter<TModel> = new EventEmitter();
+
+    @Output()
+    updated: EventEmitter<TModel> = new EventEmitter();
+
+    @Output()
+    removed: EventEmitter<TModel> = new EventEmitter();
+
 
     errors: string[] = [];
     filters: Filters;
@@ -111,18 +128,57 @@ export class PagerBaseComponent<TModel> implements IPager {
             } else {
                 this.totalPages = 1
             }
-
-
-
+            this.fetched.emit(this)
         })).pipe(finalize(() => { this.isProcessing = false; }));
     }
 
+    select(item: TModel) {
+        this.items.forEach((i: any) => i.isSelected = false);
+        (item as any).isSelected = true;
+        this.selected.emit(item);
+        return this;
+    }
+
+
+
+    update(item: TModel): Observable<TModel> {
+        const id = item[this.options.fields.id];
+        (item as any).isProcessing = true;
+        return this.options.api.update(id, item)
+            .pipe(map(data => {
+                if (this.options.cache) {
+                    this.options.cache.update(id, data).subscribe();
+                }
+                this.updated.emit(data);
+                return data;
+            })).pipe(finalize(() => {
+                (item as any).isProcessing = false;
+                return this;
+            }));
+    };
+
     add(param: TModel) {
         this.items.push(param);
+        this.created.emit(param);
         return this;
     };
 
-    remove(item: TModel): void {
+    create(item: TModel): Observable<TModel> {
+        (item as any).isProcessing = true;
+        return this.options.api.create(item)
+            .pipe(map(data => {
+                if (this.options.cache && this.options.fields.id) {
+                    this.options.cache.update(data[this.options.fields.id], data).subscribe();
+                }
+                this.add(data);
+                return data;
+            })).pipe(finalize(() => {
+                (item as any).isProcessing = false;
+                return this;
+            }));
+    };
+
+    pop(item: TModel): void {
         const id = item[this.options.fields.id];
         let found = false;
         if (this.items && this.items.length) {
@@ -138,12 +194,32 @@ export class PagerBaseComponent<TModel> implements IPager {
 
         if (found) {
             this.total = this.total - 1;
+            this.removed.emit(item);
         }
     }
+
+    remove(item: TModel): Observable<void> {
+        const id = item[this.options.fields.id];
+        (item as any).isProcessing = true;
+        return this.options.api.remove(id)
+            .pipe(map(() => {
+                if (this.options.cache) {
+                    this.options.cache.remove(id).subscribe();
+                }
+
+                this.pop(item)
+                return;
+            })).pipe(finalize(() => {
+                this.isProcessing = false;
+                (item as any).isProcessing = false;
+                return this;
+            }));
+    };
 
     clear() {
         this.total = 0;
         this.items = [];
+        this.fetched.emit(this);
     };
 
     pages(): number[] {
