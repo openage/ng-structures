@@ -39,7 +39,11 @@ export class PagerOptions<TModel> {
     if (obj.api) { this.api = obj.api; }
     if (obj.maxPagesToShow) { this.maxPagesToShow = obj.maxPagesToShow; }
     if (obj.location) { this.location = obj.location; }
-    if (obj.fields) { this.fields = obj.fields; }
+    if (obj.fields) {
+      this.fields = obj.fields;
+    } else {
+      this.fields = { id: 'id', timeStamp: 'timeStamp' }
+    }
     if (obj.pageOptions) { this.pageOptions = new PageOptions(obj.pageOptions); }
 
     if (obj.properties) { this.properties = obj.properties; }

@@ -1,8 +1,5 @@
 var DetailOptions = /** @class */ (function () {
     function DetailOptions(obj) {
-        this.fields = {
-            id: 'id'
-        };
         if (!obj) {
             return;
         }
@@ -11,6 +8,9 @@ var DetailOptions = /** @class */ (function () {
         }
         if (obj.fields) {
             this.fields = obj.fields;
+        }
+        else {
+            this.fields = { id: 'id', timeStamp: 'timeStamp' };
         }
         this.api = obj.api;
         this.cache = obj.cache;

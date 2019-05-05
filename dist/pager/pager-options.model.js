@@ -19,6 +19,9 @@ var PagerOptions = /** @class */ (function () {
         if (obj.fields) {
             this.fields = obj.fields;
         }
+        else {
+            this.fields = { id: 'id', timeStamp: 'timeStamp' };
+        }
         if (obj.pageOptions) {
             this.pageOptions = new PageOptions(obj.pageOptions);
         }

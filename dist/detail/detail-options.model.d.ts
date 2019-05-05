@@ -6,7 +6,8 @@ export declare class DetailOptions<TModel> {
     watch?: number;
     map?: (obj: any) => TModel;
     fields?: {
-        id: string;
+        id: 'id' | string;
+        timeStamp: 'timeStamp' | string;
     };
     constructor(obj?: {
         api: IApi<TModel>;
@@ -16,6 +17,7 @@ export declare class DetailOptions<TModel> {
         map?: (obj: any) => TModel;
         fields?: {
             id: 'id' | string;
+            timeStamp: 'timeStamp' | string;
         };
     });
 }

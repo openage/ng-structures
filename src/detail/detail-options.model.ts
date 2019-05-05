@@ -7,8 +7,9 @@ export class DetailOptions<TModel> {
     properties: TModel;
     watch?: number;
     map?: (obj: any) => TModel;
-    fields?= {
-        id: 'id'
+    fields?: {
+        id: 'id' | string,
+        timeStamp: 'timeStamp' | string
     };
 
     constructor(obj?: {
@@ -18,7 +19,8 @@ export class DetailOptions<TModel> {
         watch?: number,
         map?: (obj: any) => TModel,
         fields?: {
-            id: 'id' | string
+            id: 'id' | string,
+            timeStamp: 'timeStamp' | string
         }
     }) {
         if (!obj) { return; }
@@ -26,6 +28,8 @@ export class DetailOptions<TModel> {
         if (obj.properties) { this.properties = obj.properties; }
         if (obj.fields) {
             this.fields = obj.fields;
+        } else {
+            this.fields = { id: 'id', timeStamp: 'timeStamp' }
         }
         this.api = obj.api;
         this.cache = obj.cache;
