@@ -21,6 +21,8 @@ export declare class PagerBaseComponent<TModel> implements IPage<TModel>, IPager
     total: number;
     items: Array<TModel>;
     stats: any;
+    sort: string;
+    desc: boolean;
     constructor(options: {
         api: IApi<TModel>;
         properties?: TModel;
@@ -34,6 +36,8 @@ export declare class PagerBaseComponent<TModel> implements IPage<TModel>, IPager
         pageOptions?: {
             limit: number;
             offset?: number;
+            sort?: string;
+            desc?: boolean;
         } | PageOptions;
         maxPagesToShow?: number;
         filters?: any[];
@@ -43,6 +47,8 @@ export declare class PagerBaseComponent<TModel> implements IPage<TModel>, IPager
     fetch(options?: PageOptions | {
         offset?: number;
         limit?: number;
+        sort?: string;
+        desc?: boolean;
         map?: (obj: any) => TModel;
     }): Observable<void>;
     select(item: TModel): this;

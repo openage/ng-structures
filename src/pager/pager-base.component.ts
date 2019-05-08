@@ -38,6 +38,8 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
     total: number;
     items: Array<TModel>;
     stats: any;
+    sort: string;
+    desc: boolean;
 
 
     constructor(private options: {
@@ -52,7 +54,9 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
         map?: (obj: any) => TModel,
         pageOptions?: {
             limit: number,
-            offset?: number
+            offset?: number,
+            sort?: string,
+            desc?: boolean
         } | PageOptions,
         maxPagesToShow?: number,
         filters?: any[],
@@ -85,6 +89,8 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
     fetch(options?: PageOptions | {
         offset?: number;
         limit?: number;
+        sort?: string;
+        desc?: boolean;
         map?: (obj: any) => TModel;
     }) {
         this.isProcessing = true;
@@ -93,6 +99,8 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
             if (this.options.pageOptions && this.options.pageOptions.limit) {
                 options.offset = (this.currentPageNo - 1) * this.options.pageOptions.limit;
                 options.limit = this.options.pageOptions.limit;
+                options.sort = this.options.pageOptions.sort;
+                options.desc = this.options.pageOptions.desc;
             }
         }
 

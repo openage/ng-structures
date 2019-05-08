@@ -15,6 +15,8 @@ export declare class PagerModel<TModel> extends PagerBaseComponent<TModel> {
         pageOptions?: {
             limit: number;
             offset?: number;
+            sort?: string;
+            desc?: boolean;
         } | PageOptions;
         maxPagesToShow?: number;
         filters?: any[];

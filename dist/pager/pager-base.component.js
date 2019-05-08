@@ -54,6 +54,8 @@ var PagerBaseComponent = /** @class */ (function () {
             if (this.options.pageOptions && this.options.pageOptions.limit) {
                 options.offset = (this.currentPageNo - 1) * this.options.pageOptions.limit;
                 options.limit = this.options.pageOptions.limit;
+                options.sort = this.options.pageOptions.sort;
+                options.desc = this.options.pageOptions.desc;
             }
         }
         var mapFn = this.options.map;

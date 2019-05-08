@@ -10,4 +10,6 @@ export interface IPage<TModel> {
     total: number;
     items: Array<TModel>;
     stats: any;
+    sort: string;
+    desc: boolean;
 }

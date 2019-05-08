@@ -29,7 +29,9 @@ export class PagerOptions<TModel> {
     map?: (obj: any) => TModel,
     pageOptions?: {
       limit: number,
-      offset?: number
+      offset?: number,
+      sort?: string,
+      desc?: boolean
     } | PageOptions,
     maxPagesToShow?: number,
     filters?: any[],

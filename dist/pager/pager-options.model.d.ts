@@ -27,6 +27,8 @@ export declare class PagerOptions<TModel> {
         pageOptions?: {
             limit: number;
             offset?: number;
+            sort?: string;
+            desc?: boolean;
         } | PageOptions;
         maxPagesToShow?: number;
         filters?: any[];
