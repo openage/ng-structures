@@ -6,23 +6,16 @@ var Nav = /** @class */ (function () {
             return;
         this.title = obj.title;
         this.icon = obj.icon;
+        this.permissions = this.convertToArray(obj.permissions);
         this.items = [];
         if (obj.items && obj.items.length) {
             obj.items.forEach(function (item) {
+                item.permissions = _this.convertToArray(item.permissions);
                 var link = new Link(item);
-                if (!link.permissions || !link.permissions.length) {
-                    _this.items.push(link);
-                    return;
-                }
-                // this link requires permissions
-                if (!obj.permissions || !obj.permissions.length) {
-                    // no permissions supplied
-                    return;
-                }
-                link.permissions.forEach(function (requiredPermission) {
-                    if (obj.permissions.find(function (permission) { return permission.toLowerCase() === requiredPermission.toLowerCase(); })) {
-                        _this.items.push(link);
-                        return;
+                _this.items.push(link);
+                link.permissions.forEach(function (p) {
+                    if (!_this.permissions.find(function (i) { return i.toLowerCase() == p.toLowerCase(); })) {
+                        _this.permissions.push(p);
                     }
                 });
             });
@@ -35,6 +28,15 @@ var Nav = /** @class */ (function () {
             this.current.isActive = true;
         }
     }
+    Nav.prototype.convertToArray = function (permissions) {
+        if (!permissions || Array.isArray(permissions) && !permissions.length) {
+            return [];
+        }
+        if (typeof permissions === 'string') {
+            return [permissions];
+        }
+        return permissions;
+    };
     Nav.prototype.activate = function (identifier) {
         var _this = this;
         if (!identifier) {

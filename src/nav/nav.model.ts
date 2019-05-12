@@ -5,6 +5,7 @@ export class Nav {
     title: string;
     current: Link;
     items: Link[];
+    permissions?: string[];
     constructor(obj?: {
         title?: string,
         icon?: string,
@@ -15,26 +16,16 @@ export class Nav {
         if (!obj) return;
         this.title = obj.title;
         this.icon = obj.icon;
+        this.permissions = this.convertToArray(obj.permissions);
         this.items = [];
         if (obj.items && obj.items.length) {
             obj.items.forEach(item => {
+                item.permissions = this.convertToArray(item.permissions)
                 let link = new Link(item);
-
-                if (!link.permissions || !link.permissions.length) {
-                    this.items.push(link);
-                    return;
-                }
-
-                // this link requires permissions
-                if (!obj.permissions || !obj.permissions.length) {
-                    // no permissions supplied
-                    return;
-                }
-
-                link.permissions.forEach(requiredPermission => {
-                    if (obj.permissions.find(permission => permission.toLowerCase() === requiredPermission.toLowerCase())) {
-                        this.items.push(link);
-                        return;
+                this.items.push(link);
+                link.permissions.forEach(p => {
+                    if (!this.permissions.find(i => i.toLowerCase() == p.toLowerCase())) {
+                        this.permissions.push(p);
                     }
                 });
             });
@@ -46,8 +37,18 @@ export class Nav {
             this.current = this.items[0];
             this.current.isActive = true;
         }
+    }
 
+    private convertToArray(permissions) {
+        if (!permissions || Array.isArray(permissions) && !permissions.length) {
+            return []
+        }
 
+        if (typeof permissions === 'string') {
+            return [permissions];
+        }
+
+        return permissions
     }
     activate(identifier: string | number | Link): Link {
         if (!identifier) {
