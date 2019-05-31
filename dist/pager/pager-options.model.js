@@ -36,6 +36,7 @@ var PagerOptions = /** @class */ (function () {
         this.cache = obj.cache;
         this.watch = obj.watch;
         this.map = obj.map;
+        this.errorHandler = obj.errorHandler;
     }
     return PagerOptions;
 }());

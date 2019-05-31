@@ -1,9 +1,7 @@
 import { DetailOptions } from './detail-options.model';
-import { Observable, pipe } from 'rxjs';
-import { Input, EventEmitter, Output } from '@angular/core';
-import { finalize, map } from 'rxjs/operators'
+import { Input, EventEmitter, Output, ErrorHandler } from '@angular/core';
 import { IApi } from '@open-age/ng-api';
-
+import { Observable, Subject } from 'rxjs';
 
 export class DetailBase<TModel> {
 
@@ -23,21 +21,36 @@ export class DetailBase<TModel> {
   @Output()
   removed: EventEmitter<TModel> = new EventEmitter();
 
+  @Output()
+  errored: EventEmitter<any> = new EventEmitter();
+
   errors: string[] = [];
   id: number | string;
   isProcessing = false;
 
-  constructor(private options: {
+  private options: DetailOptions<TModel>;
+
+  constructor(options: {
     api: IApi<TModel>,
+    cache?: IApi<TModel>,
     properties?: TModel,
     watch?: number,
-    cache?: IApi<TModel>,
     map?: (obj: any) => TModel,
     fields?: {
-      id: 'id' | string
-    }
+      id: 'id' | string,
+      timeStamp: 'timeStamp' | string
+    },
+    errorHandler?: ErrorHandler
   } | DetailOptions<TModel>) {
-    if (options.properties) {
+
+    if (options instanceof DetailOptions) {
+      this.options = options;
+    } else {
+      this.options = new DetailOptions(options);
+
+    }
+
+    if (this.options.properties) {
       this.originalModel = JSON.parse(JSON.stringify(options.properties));
       this.setModel(options.properties);
     }
@@ -49,31 +62,40 @@ export class DetailBase<TModel> {
     if (this.errors) {
       this.errors.splice(0, this.errors.length);
     }
-  };
+  }
 
   get(id: string | number): Observable<TModel> {
     this.isProcessing = true;
-    return this.options.api.get(id, {
+    let subject = new Subject<TModel>();
+    this.options.api.get(id, {
       watch: this.options.watch,
       map: this.options.map
-    }).pipe(map(data => {
+    }).subscribe(data => {
       this.setModel(data);
       if (this.options.cache) {
         this.options.cache.update(id, data).subscribe();
       }
-      this.fetched.emit(this.properties);
-      return data;
-    })).pipe(finalize(() => {
       this.isProcessing = false;
-      return this;
-    }));
+      this.fetched.emit(this.properties);
+      subject.next(this.properties);
+      return data;
+    }, error => {
+      this.isProcessing = false;
+      this.errors = [error];
+      this.errored.next(error);
+      if (this.options.errorHandler) {
+        this.options.errorHandler.handleError(error);
+      }
+      subject.error(error);
+    });
+    return subject.asObservable();
   };
 
   set(data: TModel) {
     this.setModel(data);
   };
 
-  refresh(): Observable<TModel> {
+  refresh() {
     return this.get(this.id);
   };
 
@@ -85,51 +107,86 @@ export class DetailBase<TModel> {
     this.setModel(this.originalModel);
   };
 
-  create(model?: TModel): Observable<TModel> {
-    this.isProcessing = true;
-    return this.options.api.create(this.properties)
-      .pipe(map(data => {
-        this.setModel(data);
-        if (this.options.cache && this.options.fields.id) {
-          this.options.cache.update(data[this.options.fields.id], data).subscribe();
-        }
-        this.created.emit(this.properties);
-        return data;
-      })).pipe(finalize(() => {
-        this.isProcessing = false;
-        return this;
-      }));
-  };
+  save(model?: any): Observable<TModel> {
+    if (this.properties[this.options.fields.id]) {
+      return this.update(model);
+    } else {
+      return this.create(model);
+    }
+  }
 
-  update(): Observable<TModel> {
+  create(model?: any): Observable<TModel> {
+    this.isProcessing = true;
+    model = model || this.properties;
+    let subject = new Subject<TModel>();
+    this.options.api.create(model).subscribe(data => {
+      this.setModel(data);
+      if (this.options.cache && this.options.fields.id) {
+        this.options.cache.update(data[this.options.fields.id], data).subscribe();
+      }
+      this.isProcessing = false;
+      this.created.emit(this.properties);
+      subject.next(this.properties);
+      return data;
+    }, error => {
+      this.isProcessing = false;
+      this.errors = [error];
+      this.errored.next(error);
+      if (this.options.errorHandler) {
+        this.options.errorHandler.handleError(error);
+      }
+      subject.error(error);
+    });
+    return subject.asObservable();
+  }
+
+  update(model?: any): Observable<TModel> {
     this.isProcessing = true;
     const id = this.properties[this.options.fields.id];
-    return this.options.api.update(id, this.properties)
-      .pipe(map(data => {
-        this.setModel(data);
-        if (this.options.cache) {
-          this.options.cache.update(this.id, data).subscribe();
-        }
-        this.updated.emit(this.properties);
-        return data;
-      })).pipe(finalize(() => {
-        this.isProcessing = false;
-        return this;
-      }));
-  };
+    model = model || this.properties
+    let subject = new Subject<TModel>();
+    this.options.api.update(id, model).subscribe(data => {
+      this.setModel(data);
+      if (this.options.cache) {
+        this.options.cache.update(this.id, data).subscribe();
+      }
+      this.isProcessing = false;
+      this.updated.emit(this.properties);
+      subject.next(this.properties);
+      return data;
+    }, error => {
+      this.isProcessing = false;
+      this.errors = [error];
+      this.errored.next(error);
+      if (this.options.errorHandler) {
+        this.options.errorHandler.handleError(error);
+      }
+      subject.error(error);
+    });
+    return subject.asObservable();
+  }
 
-  remove(): Observable<void> {
+  remove(): Observable<TModel> {
     this.isProcessing = true;
-    return this.options.api.remove(this.id)
-      .pipe(map(() => {
-        if (this.options.cache) {
-          this.options.cache.remove(this.id).subscribe();
-        }
-        this.removed.emit(this.properties);
-        return;
-      })).pipe(finalize(() => {
-        this.isProcessing = false;
-        return this;
-      }));
-  };
+    let subject = new Subject<TModel>();
+
+    this.options.api.remove(this.id).subscribe(() => {
+      if (this.options.cache) {
+        this.options.cache.remove(this.id).subscribe();
+      }
+      this.isProcessing = false;
+      this.removed.emit(this.properties);
+      subject.next(this.properties);
+      return;
+    }, error => {
+      this.isProcessing = false;
+      this.errors = [error];
+      this.errored.next(error);
+      if (this.options.errorHandler) {
+        this.options.errorHandler.handleError(error);
+      }
+      subject.error(error);
+    });
+    return subject.asObservable();
+  }
 };

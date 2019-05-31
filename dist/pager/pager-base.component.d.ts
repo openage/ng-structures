@@ -2,16 +2,16 @@ import { Location } from '@angular/common';
 import { IPager, IPage } from './pager.interface';
 import { PagerOptions } from './pager-options.model';
 import { Filters } from '../filter/index';
-import { PageOptions, IApi } from '@open-age/ng-api';
-import { EventEmitter } from '@angular/core';
+import { PageOptions, IApi, Page } from '@open-age/ng-api';
+import { EventEmitter, ErrorHandler } from '@angular/core';
 import { Observable } from 'rxjs';
 export declare class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
-    private options;
     fetched: EventEmitter<IPage<TModel>>;
     selected: EventEmitter<TModel>;
     created: EventEmitter<TModel>;
     updated: EventEmitter<TModel>;
     removed: EventEmitter<TModel>;
+    errored: EventEmitter<any>;
     errors: string[];
     filters: Filters;
     isProcessing: boolean;
@@ -23,6 +23,7 @@ export declare class PagerBaseComponent<TModel> implements IPage<TModel>, IPager
     stats: any;
     sort: string;
     desc: boolean;
+    private options;
     constructor(options: {
         api: IApi<TModel>;
         properties?: TModel;
@@ -40,6 +41,7 @@ export declare class PagerBaseComponent<TModel> implements IPage<TModel>, IPager
             desc?: boolean;
         } | PageOptions;
         maxPagesToShow?: number;
+        errorHandler?: ErrorHandler;
         filters?: any[];
         location?: Location;
     } | PagerOptions<TModel>);
@@ -50,16 +52,16 @@ export declare class PagerBaseComponent<TModel> implements IPage<TModel>, IPager
         sort?: string;
         desc?: boolean;
         map?: (obj: any) => TModel;
-    }): Observable<void>;
+    }): Observable<Page<TModel>>;
     select(item: TModel): this;
     update(item: TModel): Observable<TModel>;
     add(param: TModel): this;
     create(item: TModel): Observable<TModel>;
     pop(item: TModel): void;
-    remove(item: TModel): Observable<void>;
+    remove(item: TModel): import("rxjs").Subscription;
     clear(): void;
     pages(): number[];
-    showPage(pageNo: number): import("rxjs").Subscription;
-    showPrevious(): void;
-    showNext(): void;
+    showPage(pageNo: number): Observable<Page<TModel>>;
+    showPrevious(): Observable<Page<TModel>>;
+    showNext(): Observable<Page<TModel>>;
 }

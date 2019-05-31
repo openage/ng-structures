@@ -16,6 +16,19 @@ var DetailOptions = /** @class */ (function () {
         this.cache = obj.cache;
         this.watch = obj.watch;
         this.map = obj.map;
+        this.errorHandler = obj.errorHandler;
+        /**
+    api: IApi<TModel>,
+    properties?: TModel,
+    watch?: number,
+    cache?: IApi<TModel>,
+    map?: (obj: any) => TModel,
+    fields?: {
+      id: 'id' | string,
+      timeStamp: 'timeStamp' | string
+    },
+    errorHandler?: ErrorHandler
+         */
     }
     return DetailOptions;
 }());

@@ -5,9 +5,8 @@ import { PagerOptions } from './pager-options.model';
 import { Filters } from '../filter/index';
 import { PageOptions, IApi, Page } from '@open-age/ng-api';
 import { finalize, map } from 'rxjs/operators'
-import { Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
-
+import { Output, EventEmitter, ErrorHandler } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 
 export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
 
@@ -26,6 +25,8 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
     @Output()
     removed: EventEmitter<TModel> = new EventEmitter();
 
+    @Output()
+    errored: EventEmitter<any> = new EventEmitter();
 
     errors: string[] = [];
     filters: Filters;
@@ -41,8 +42,9 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
     sort: string;
     desc: boolean;
 
+    private options: PagerOptions<TModel>;
 
-    constructor(private options: {
+    constructor(options: {
         api: IApi<TModel>,
         properties?: TModel,
         fields?: {
@@ -59,21 +61,24 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
             desc?: boolean
         } | PageOptions,
         maxPagesToShow?: number,
+        errorHandler?: ErrorHandler,
         filters?: any[],
         location?: Location
     } | PagerOptions<TModel>) {
         this.items = [];
 
-        if (!(options instanceof PagerOptions)) {
-            options = new PagerOptions<TModel>(options);
+        if (options instanceof PagerOptions) {
+            this.options = options;
+        } else {
+            this.options = new PagerOptions(options);
         }
-        if (!options.pageOptions) {
-            options.pageOptions = new PageOptions();
+        if (!this.options.pageOptions) {
+            this.options.pageOptions = new PageOptions();
         }
         this.filters = new Filters({
             associatedList: this,
-            filters: options.filters,
-            location: options.location
+            filters: this.options.filters,
+            location: this.options.location
         });
     }
 
@@ -87,11 +92,11 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
     }
 
     fetch(options?: PageOptions | {
-        offset?: number;
-        limit?: number;
-        sort?: string;
-        desc?: boolean;
-        map?: (obj: any) => TModel;
+        offset?: number,
+        limit?: number,
+        sort?: string,
+        desc?: boolean,
+        map?: (obj: any) => TModel
     }) {
         this.isProcessing = true;
         if (!options) {
@@ -112,12 +117,12 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
 
         this.filters.getQuery();
 
-        return this.options.api.search(this.filters.getQuery(), {
+        let subject = new Subject<Page<TModel>>();
+        this.options.api.search(this.filters.getQuery(), {
             limit: options.limit,
             offset: options.offset,
             map: mapFn
-        }).pipe(map(page => {
-            this.isProcessing = false;
+        }).subscribe(page => {
             const items: TModel[] = [];
             page.stats = page.stats || {};
             page.items.forEach((item) => {
@@ -136,8 +141,20 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
             } else {
                 this.totalPages = 1
             }
-            this.fetched.emit(this)
-        })).pipe(finalize(() => { this.isProcessing = false; }));
+
+            this.isProcessing = false;
+            this.fetched.emit(this);
+            subject.next(page);
+        }, error => {
+            this.errors = [error];
+            this.isProcessing = false;
+            this.errored.next(error);
+            if (this.options.errorHandler) {
+                this.options.errorHandler.handleError(error);
+            }
+            subject.error(error);
+        });
+        return subject.asObservable()
     }
 
     select(item: TModel) {
@@ -147,22 +164,28 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
         return this;
     }
 
-
-
-    update(item: TModel): Observable<TModel> {
+    update(item: TModel) {
         const id = item[this.options.fields.id];
         (item as any).isProcessing = true;
-        return this.options.api.update(id, item)
-            .pipe(map(data => {
-                if (this.options.cache) {
-                    this.options.cache.update(id, data).subscribe();
-                }
-                this.updated.emit(data);
-                return data;
-            })).pipe(finalize(() => {
-                (item as any).isProcessing = false;
-                return this;
-            }));
+        let subject = new Subject<TModel>();
+        this.options.api.update(id, item).subscribe(data => {
+            if (this.options.cache) {
+                this.options.cache.update(id, data).subscribe();
+            }
+            (item as any).isProcessing = false;
+            this.updated.emit(data);
+            subject.next(data);
+            return data;
+        }, error => {
+            (item as any).isProcessing = false;
+            this.errors = [error];
+            this.errored.next(error);
+            if (this.options.errorHandler) {
+                this.options.errorHandler.handleError(error);
+            }
+            subject.error(error);
+        });
+        return subject.asObservable();
     };
 
     add(param: TModel) {
@@ -171,19 +194,27 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
         return this;
     };
 
-    create(item: TModel): Observable<TModel> {
+    create(item: TModel) {
         (item as any).isProcessing = true;
-        return this.options.api.create(item)
-            .pipe(map(data => {
-                if (this.options.cache && this.options.fields.id) {
-                    this.options.cache.update(data[this.options.fields.id], data).subscribe();
-                }
-                this.add(data);
-                return data;
-            })).pipe(finalize(() => {
-                (item as any).isProcessing = false;
-                return this;
-            }));
+        let subject = new Subject<TModel>();
+        this.options.api.create(item).subscribe(data => {
+            if (this.options.cache && this.options.fields.id) {
+                this.options.cache.update(data[this.options.fields.id], data).subscribe();
+            }
+            (item as any).isProcessing = false;
+            this.add(data);
+            subject.next(data);
+            return data;
+        }, error => {
+            (item as any).isProcessing = false;
+            this.errors = [error];
+            this.errored.next(error);
+            if (this.options.errorHandler) {
+                this.options.errorHandler.handleError(error);
+            }
+            subject.error(error);
+        });
+        return subject.asObservable();
     };
 
     pop(item: TModel): void {
@@ -206,22 +237,27 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
         }
     }
 
-    remove(item: TModel): Observable<void> {
+    remove(item: TModel) {
         const id = item[this.options.fields.id];
         (item as any).isProcessing = true;
-        return this.options.api.remove(id)
-            .pipe(map(() => {
-                if (this.options.cache) {
-                    this.options.cache.remove(id).subscribe();
-                }
-
-                this.pop(item)
-                return;
-            })).pipe(finalize(() => {
-                this.isProcessing = false;
-                (item as any).isProcessing = false;
-                return this;
-            }));
+        let subject = new Subject<TModel>();
+        return this.options.api.remove(id).subscribe(() => {
+            if (this.options.cache) {
+                this.options.cache.remove(id).subscribe();
+            }
+            (item as any).isProcessing = false;
+            this.pop(item)
+            subject.next(item);
+            return;
+        }, error => {
+            (item as any).isProcessing = false;
+            this.errors = [error];
+            this.errored.next(error);
+            if (this.options.errorHandler) {
+                this.options.errorHandler.handleError(error);
+            }
+            subject.error(error);
+        });
     };
 
     clear() {
@@ -286,21 +322,21 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
             return;
         }
 
-        return this.fetch(this.convertToPageOption(pageNo)).subscribe();
+        return this.fetch(this.convertToPageOption(pageNo));
     }
 
     showPrevious() {
         if (this.isProcessing || this.currentPageNo <= 1) {
             return;
         }
-        this.showPage(this.currentPageNo - 1);
+        return this.showPage(this.currentPageNo - 1);
     };
 
     showNext() {
         if (this.isProcessing || this.totalPages <= this.currentPageNo) {
             return;
         }
-        this.showPage(this.currentPageNo + 1);
+        return this.showPage(this.currentPageNo + 1);
     };
 }
 

@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { IApi, PageOptions } from '@open-age/ng-api';
+import { ErrorHandler } from '@angular/core';
 export declare class PagerOptions<TModel> {
     api: IApi<TModel>;
     properties?: TModel;
@@ -14,6 +15,7 @@ export declare class PagerOptions<TModel> {
     maxPagesToShow?: number;
     filters?: any[];
     location?: Location;
+    errorHandler?: ErrorHandler;
     constructor(obj?: {
         api: IApi<TModel>;
         properties?: TModel;
@@ -32,6 +34,7 @@ export declare class PagerOptions<TModel> {
         } | PageOptions;
         maxPagesToShow?: number;
         filters?: any[];
+        errorHandler?: ErrorHandler;
         location?: Location;
     });
 }

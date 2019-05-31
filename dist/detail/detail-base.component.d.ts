@@ -1,27 +1,30 @@
 import { DetailOptions } from './detail-options.model';
-import { Observable } from 'rxjs';
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, ErrorHandler } from '@angular/core';
 import { IApi } from '@open-age/ng-api';
+import { Observable } from 'rxjs';
 export declare class DetailBase<TModel> {
-    private options;
     private originalModel;
     properties: TModel;
     fetched: EventEmitter<TModel>;
     created: EventEmitter<TModel>;
     updated: EventEmitter<TModel>;
     removed: EventEmitter<TModel>;
+    errored: EventEmitter<any>;
     errors: string[];
     id: number | string;
     isProcessing: boolean;
+    private options;
     constructor(options: {
         api: IApi<TModel>;
+        cache?: IApi<TModel>;
         properties?: TModel;
         watch?: number;
-        cache?: IApi<TModel>;
         map?: (obj: any) => TModel;
         fields?: {
             id: 'id' | string;
+            timeStamp: 'timeStamp' | string;
         };
+        errorHandler?: ErrorHandler;
     } | DetailOptions<TModel>);
     private setModel;
     get(id: string | number): Observable<TModel>;
@@ -29,7 +32,8 @@ export declare class DetailBase<TModel> {
     refresh(): Observable<TModel>;
     clear(): void;
     reset(): void;
-    create(model?: TModel): Observable<TModel>;
-    update(): Observable<TModel>;
-    remove(): Observable<void>;
+    save(model?: any): Observable<TModel>;
+    create(model?: any): Observable<TModel>;
+    update(model?: any): Observable<TModel>;
+    remove(): Observable<TModel>;
 }

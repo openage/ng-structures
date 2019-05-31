@@ -1,6 +1,7 @@
 import { PagerBaseComponent, PagerOptions } from ".";
 import { IApi, PageOptions } from "@open-age/ng-api";
 import { Location } from '@angular/common';
+import { ErrorHandler } from "@angular/core";
 
 export class PagerModel<TModel> extends PagerBaseComponent<TModel>  {
   constructor(options: {
@@ -21,7 +22,8 @@ export class PagerModel<TModel> extends PagerBaseComponent<TModel>  {
     } | PageOptions,
     maxPagesToShow?: number,
     filters?: any[],
-    location?: Location
+    location?: Location,
+    errorHandler?: ErrorHandler
   } | PagerOptions<TModel>) {
     super(options);
   }

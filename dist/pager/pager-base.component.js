@@ -10,32 +10,35 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import { PagerOptions } from './pager-options.model';
 import { Filters } from '../filter/index';
 import { PageOptions } from '@open-age/ng-api';
-import { finalize, map } from 'rxjs/operators';
 import { Output, EventEmitter } from '@angular/core';
+import { Subject } from 'rxjs';
 var PagerBaseComponent = /** @class */ (function () {
     function PagerBaseComponent(options) {
-        this.options = options;
         this.fetched = new EventEmitter();
         this.selected = new EventEmitter();
         this.created = new EventEmitter();
         this.updated = new EventEmitter();
         this.removed = new EventEmitter();
+        this.errored = new EventEmitter();
         this.errors = [];
         this.isProcessing = false;
         this.isGettingStats = false;
         this.currentPageNo = 1;
         this.totalPages = 0;
         this.items = [];
-        if (!(options instanceof PagerOptions)) {
-            options = new PagerOptions(options);
+        if (options instanceof PagerOptions) {
+            this.options = options;
         }
-        if (!options.pageOptions) {
-            options.pageOptions = new PageOptions();
+        else {
+            this.options = new PagerOptions(options);
+        }
+        if (!this.options.pageOptions) {
+            this.options.pageOptions = new PageOptions();
         }
         this.filters = new Filters({
             associatedList: this,
-            filters: options.filters,
-            location: options.location
+            filters: this.options.filters,
+            location: this.options.location
         });
     }
     PagerBaseComponent.prototype.convertToPageOption = function (pageNo) {
@@ -63,12 +66,12 @@ var PagerBaseComponent = /** @class */ (function () {
             mapFn = options.map;
         }
         this.filters.getQuery();
-        return this.options.api.search(this.filters.getQuery(), {
+        var subject = new Subject();
+        this.options.api.search(this.filters.getQuery(), {
             limit: options.limit,
             offset: options.offset,
             map: mapFn
-        }).pipe(map(function (page) {
-            _this.isProcessing = false;
+        }).subscribe(function (page) {
             var items = [];
             page.stats = page.stats || {};
             page.items.forEach(function (item) {
@@ -86,8 +89,19 @@ var PagerBaseComponent = /** @class */ (function () {
             else {
                 _this.totalPages = 1;
             }
+            _this.isProcessing = false;
             _this.fetched.emit(_this);
-        })).pipe(finalize(function () { _this.isProcessing = false; }));
+            subject.next(page);
+        }, function (error) {
+            _this.errors = [error];
+            _this.isProcessing = false;
+            _this.errored.next(error);
+            if (_this.options.errorHandler) {
+                _this.options.errorHandler.handleError(error);
+            }
+            subject.error(error);
+        });
+        return subject.asObservable();
     };
     PagerBaseComponent.prototype.select = function (item) {
         this.items.forEach(function (i) { return i.isSelected = false; });
@@ -99,17 +113,25 @@ var PagerBaseComponent = /** @class */ (function () {
         var _this = this;
         var id = item[this.options.fields.id];
         item.isProcessing = true;
-        return this.options.api.update(id, item)
-            .pipe(map(function (data) {
+        var subject = new Subject();
+        this.options.api.update(id, item).subscribe(function (data) {
             if (_this.options.cache) {
                 _this.options.cache.update(id, data).subscribe();
             }
-            _this.updated.emit(data);
-            return data;
-        })).pipe(finalize(function () {
             item.isProcessing = false;
-            return _this;
-        }));
+            _this.updated.emit(data);
+            subject.next(data);
+            return data;
+        }, function (error) {
+            item.isProcessing = false;
+            _this.errors = [error];
+            _this.errored.next(error);
+            if (_this.options.errorHandler) {
+                _this.options.errorHandler.handleError(error);
+            }
+            subject.error(error);
+        });
+        return subject.asObservable();
     };
     ;
     PagerBaseComponent.prototype.add = function (param) {
@@ -121,17 +143,25 @@ var PagerBaseComponent = /** @class */ (function () {
     PagerBaseComponent.prototype.create = function (item) {
         var _this = this;
         item.isProcessing = true;
-        return this.options.api.create(item)
-            .pipe(map(function (data) {
+        var subject = new Subject();
+        this.options.api.create(item).subscribe(function (data) {
             if (_this.options.cache && _this.options.fields.id) {
                 _this.options.cache.update(data[_this.options.fields.id], data).subscribe();
             }
-            _this.add(data);
-            return data;
-        })).pipe(finalize(function () {
             item.isProcessing = false;
-            return _this;
-        }));
+            _this.add(data);
+            subject.next(data);
+            return data;
+        }, function (error) {
+            item.isProcessing = false;
+            _this.errors = [error];
+            _this.errored.next(error);
+            if (_this.options.errorHandler) {
+                _this.options.errorHandler.handleError(error);
+            }
+            subject.error(error);
+        });
+        return subject.asObservable();
     };
     ;
     PagerBaseComponent.prototype.pop = function (item) {
@@ -156,18 +186,24 @@ var PagerBaseComponent = /** @class */ (function () {
         var _this = this;
         var id = item[this.options.fields.id];
         item.isProcessing = true;
-        return this.options.api.remove(id)
-            .pipe(map(function () {
+        var subject = new Subject();
+        return this.options.api.remove(id).subscribe(function () {
             if (_this.options.cache) {
                 _this.options.cache.remove(id).subscribe();
             }
-            _this.pop(item);
-            return;
-        })).pipe(finalize(function () {
-            _this.isProcessing = false;
             item.isProcessing = false;
-            return _this;
-        }));
+            _this.pop(item);
+            subject.next(item);
+            return;
+        }, function (error) {
+            item.isProcessing = false;
+            _this.errors = [error];
+            _this.errored.next(error);
+            if (_this.options.errorHandler) {
+                _this.options.errorHandler.handleError(error);
+            }
+            subject.error(error);
+        });
     };
     ;
     PagerBaseComponent.prototype.clear = function () {
@@ -227,20 +263,20 @@ var PagerBaseComponent = /** @class */ (function () {
             pageNo = this.totalPages;
             return;
         }
-        return this.fetch(this.convertToPageOption(pageNo)).subscribe();
+        return this.fetch(this.convertToPageOption(pageNo));
     };
     PagerBaseComponent.prototype.showPrevious = function () {
         if (this.isProcessing || this.currentPageNo <= 1) {
             return;
         }
-        this.showPage(this.currentPageNo - 1);
+        return this.showPage(this.currentPageNo - 1);
     };
     ;
     PagerBaseComponent.prototype.showNext = function () {
         if (this.isProcessing || this.totalPages <= this.currentPageNo) {
             return;
         }
-        this.showPage(this.currentPageNo + 1);
+        return this.showPage(this.currentPageNo + 1);
     };
     ;
     __decorate([
@@ -263,6 +299,10 @@ var PagerBaseComponent = /** @class */ (function () {
         Output(),
         __metadata("design:type", EventEmitter)
     ], PagerBaseComponent.prototype, "removed", void 0);
+    __decorate([
+        Output(),
+        __metadata("design:type", EventEmitter)
+    ], PagerBaseComponent.prototype, "errored", void 0);
     return PagerBaseComponent;
 }());
 export { PagerBaseComponent };

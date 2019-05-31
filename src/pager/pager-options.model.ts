@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { IApi, PageOptions } from '@open-age/ng-api';
+import { ErrorHandler } from '@angular/core';
 
 export class PagerOptions<TModel> {
 
@@ -16,6 +17,7 @@ export class PagerOptions<TModel> {
   maxPagesToShow?= 10;
   filters?: any[] = [];
   location?: Location;
+  errorHandler?: ErrorHandler;
 
   constructor(obj?: {
     api: IApi<TModel>,
@@ -35,6 +37,7 @@ export class PagerOptions<TModel> {
     } | PageOptions,
     maxPagesToShow?: number,
     filters?: any[],
+    errorHandler?: ErrorHandler,
     location?: Location
   }) {
     if (!obj) { return; }
@@ -59,5 +62,6 @@ export class PagerOptions<TModel> {
     this.cache = obj.cache;
     this.watch = obj.watch;
     this.map = obj.map;
+    this.errorHandler = obj.errorHandler;
   }
 }
