@@ -14,6 +14,7 @@ export declare class PagerOptions<TModel> {
     pageOptions?: PageOptions;
     maxPagesToShow?: number;
     filters?: any[];
+    addOperator?: boolean;
     location?: Location;
     errorHandler?: ErrorHandler;
     constructor(obj?: {
@@ -34,6 +35,7 @@ export declare class PagerOptions<TModel> {
         } | PageOptions;
         maxPagesToShow?: number;
         filters?: any[];
+        addOperator?: boolean;
         errorHandler?: ErrorHandler;
         location?: Location;
     });

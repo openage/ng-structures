@@ -43,6 +43,7 @@ export declare class PagerBaseComponent<TModel> implements IPage<TModel>, IPager
         maxPagesToShow?: number;
         errorHandler?: ErrorHandler;
         filters?: any[];
+        addOperator?: boolean;
         location?: Location;
     } | PagerOptions<TModel>);
     private convertToPageOption;

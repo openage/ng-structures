@@ -22,6 +22,7 @@ export class PagerModel<TModel> extends PagerBaseComponent<TModel>  {
     } | PageOptions,
     maxPagesToShow?: number,
     filters?: any[],
+    addOperator?: boolean,
     location?: Location,
     errorHandler?: ErrorHandler
   } | PagerOptions<TModel>) {

@@ -61,10 +61,13 @@ export class Filters implements IFilters {
             }
 
             if (item.value && item.value !== '' && item.value !== 0) {
-                // params['f[' + count + '][f]'] = item.field;
-                // params['f[' + count + '][o]'] = item.operator;
-                // params['f[' + count + '][v]'] = item.value;
-                query[item.field] = item.value;
+                if (this.options.addOperator) {
+                    query[`f[${count}][f]`] = item.field;
+                    query[`f[${count}][o]`] = item.operator;
+                    query[`f[${count}][v]`] = item.value;
+                } else {
+                    query[item.field] = item.value;
+                }
                 count++;
             }
         });

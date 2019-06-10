@@ -38,7 +38,8 @@ var PagerBaseComponent = /** @class */ (function () {
         this.filters = new Filters({
             associatedList: this,
             filters: this.options.filters,
-            location: this.options.location
+            location: this.options.location,
+            addOperator: this.options.addOperator,
         });
     }
     PagerBaseComponent.prototype.convertToPageOption = function (pageNo) {

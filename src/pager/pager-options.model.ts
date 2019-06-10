@@ -16,6 +16,7 @@ export class PagerOptions<TModel> {
   pageOptions?: PageOptions;
   maxPagesToShow?= 10;
   filters?: any[] = [];
+  addOperator?: boolean;
   location?: Location;
   errorHandler?: ErrorHandler;
 
@@ -37,6 +38,7 @@ export class PagerOptions<TModel> {
     } | PageOptions,
     maxPagesToShow?: number,
     filters?: any[],
+    addOperator?: boolean,
     errorHandler?: ErrorHandler,
     location?: Location
   }) {
@@ -57,6 +59,10 @@ export class PagerOptions<TModel> {
       obj.filters.forEach(element => {
         this.filters.push(element);
       });
+    }
+
+    if (obj.addOperator) {
+      this.addOperator = obj.addOperator;
     }
 
     this.cache = obj.cache;

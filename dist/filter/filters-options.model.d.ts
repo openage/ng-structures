@@ -4,4 +4,5 @@ export declare class FiltersOptions {
     associatedList: IPager;
     location?: Location;
     filters: any[];
+    addOperator?: boolean;
 }

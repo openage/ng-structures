@@ -34,6 +34,7 @@ var Filters = /** @class */ (function () {
         return this.apply();
     };
     Filters.prototype.getQuery = function () {
+        var _this = this;
         var query = {};
         var urlSearchParams = this.location ? (new URLSearchParams(this.location.path().split('?')[1])) : null;
         var count = 0;
@@ -43,10 +44,14 @@ var Filters = /** @class */ (function () {
                 urlSearchParams.set(item.field, item.isEmpty() ? null : value);
             }
             if (item.value && item.value !== '' && item.value !== 0) {
-                // params['f[' + count + '][f]'] = item.field;
-                // params['f[' + count + '][o]'] = item.operator;
-                // params['f[' + count + '][v]'] = item.value;
-                query[item.field] = item.value;
+                if (_this.options.addOperator) {
+                    query["f[" + count + "][f]"] = item.field;
+                    query["f[" + count + "][o]"] = item.operator;
+                    query["f[" + count + "][v]"] = item.value;
+                }
+                else {
+                    query[item.field] = item.value;
+                }
                 count++;
             }
         });

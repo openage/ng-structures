@@ -33,6 +33,9 @@ var PagerOptions = /** @class */ (function () {
                 _this.filters.push(element);
             });
         }
+        if (obj.addOperator) {
+            this.addOperator = obj.addOperator;
+        }
         this.cache = obj.cache;
         this.watch = obj.watch;
         this.map = obj.map;

@@ -63,6 +63,7 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
         maxPagesToShow?: number,
         errorHandler?: ErrorHandler,
         filters?: any[],
+        addOperator?: boolean,
         location?: Location
     } | PagerOptions<TModel>) {
         this.items = [];
@@ -78,7 +79,8 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
         this.filters = new Filters({
             associatedList: this,
             filters: this.options.filters,
-            location: this.options.location
+            location: this.options.location,
+            addOperator: this.options.addOperator,
         });
     }
 
