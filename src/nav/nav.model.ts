@@ -33,7 +33,7 @@ export class Nav {
 
         if (obj.current) {
             this.activate(obj.current);
-        } else {
+        } else if (this.items && this.items.length) {
             this.current = this.items[0];
             this.current.isActive = true;
         }
@@ -73,11 +73,14 @@ export class Nav {
             }
         });
 
-        if (!this.current) {
+        if (!this.current && this.items && this.items.length) {
             this.current = this.items[0];
         }
 
-        this.current.isActive = true;
+        if (this.current) {
+            this.current.isActive = true;
+        }
+
         return this.current;
     }
 

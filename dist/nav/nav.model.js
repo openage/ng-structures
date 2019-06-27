@@ -23,7 +23,7 @@ var Nav = /** @class */ (function () {
         if (obj.current) {
             this.activate(obj.current);
         }
-        else {
+        else if (this.items && this.items.length) {
             this.current = this.items[0];
             this.current.isActive = true;
         }
@@ -62,10 +62,12 @@ var Nav = /** @class */ (function () {
                 _this.current = element;
             }
         });
-        if (!this.current) {
+        if (!this.current && this.items && this.items.length) {
             this.current = this.items[0];
         }
-        this.current.isActive = true;
+        if (this.current) {
+            this.current.isActive = true;
+        }
         return this.current;
     };
     Nav.prototype.reset = function () {
