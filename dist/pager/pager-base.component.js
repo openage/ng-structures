@@ -81,6 +81,7 @@ var PagerBaseComponent = /** @class */ (function () {
                     _this.options.cache.update(item[_this.options.fields.id], item).subscribe();
                 }
             });
+            _this.stats = page.stats;
             _this.items = items;
             _this.total = page.total || page.stats.total || _this.items.length;
             _this.currentPageNo = page.pageNo;

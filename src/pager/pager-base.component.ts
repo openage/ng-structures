@@ -134,6 +134,7 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
                 }
             });
 
+            this.stats = page.stats;
             this.items = items;
             this.total = page.total || page.stats.total || this.items.length;
             this.currentPageNo = page.pageNo;
