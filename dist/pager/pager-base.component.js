@@ -85,8 +85,11 @@ var PagerBaseComponent = /** @class */ (function () {
             _this.items = items;
             _this.total = page.total || page.stats.total || _this.items.length;
             _this.currentPageNo = page.pageNo;
-            if (_this.options.pageOptions) {
-                _this.totalPages = Math.ceil(_this.total / _this.options.pageOptions.limit);
+            _this.pageSize = page.pageSize;
+            _this.limit = options.limit;
+            _this.offset = options.offset;
+            if (options.limit) {
+                _this.totalPages = Math.ceil(_this.total / options.limit);
             }
             else {
                 _this.totalPages = 1;

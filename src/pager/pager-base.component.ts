@@ -36,6 +36,9 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
     currentPageNo = 1;
     totalPages = 0;
 
+    pageSize: number;
+    limit: number;
+    offset: number;
     total: number;
     items: Array<TModel>;
     stats: any;
@@ -138,9 +141,13 @@ export class PagerBaseComponent<TModel> implements IPage<TModel>, IPager {
             this.items = items;
             this.total = page.total || page.stats.total || this.items.length;
             this.currentPageNo = page.pageNo;
+            this.pageSize = page.pageSize;
 
-            if (this.options.pageOptions) {
-                this.totalPages = Math.ceil(this.total / this.options.pageOptions.limit);
+            this.limit = options.limit
+            this.offset = options.offset;
+
+            if (options.limit) {
+                this.totalPages = Math.ceil(this.total / options.limit);
             } else {
                 this.totalPages = 1
             }

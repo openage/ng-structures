@@ -18,6 +18,9 @@ export declare class PagerBaseComponent<TModel> implements IPage<TModel>, IPager
     isGettingStats: boolean;
     currentPageNo: number;
     totalPages: number;
+    pageSize: number;
+    limit: number;
+    offset: number;
     total: number;
     items: Array<TModel>;
     stats: any;
